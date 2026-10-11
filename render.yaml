@@ -1,0 +1,85 @@
+# Render Blueprint for the BorrowBox backend: MySQL 8 (private service with a disk) + the Spring
+# Boot API (Docker). The frontend is deployed on Vercel and proxies /api and /uploads to the API
+# (apps/web/vercel.json), so the browser only talks to the Vercel domain.
+# Values marked `sync: false` are asked for when you create the Blueprint.
+services:
+  - type: pserv
+    name: borrowbox-mysql
+    runtime: docker
+    plan: starter
+    region: singapore
+    dockerfilePath: ./deploy/mysql/Dockerfile
+    dockerContext: ./deploy/mysql
+    disk:
+      name: mysql-data
+      mountPath: /var/lib/mysql
+      sizeGB: 5
+    envVars:
+      - key: MYSQL_DATABASE
+        value: borrowbox
+      - key: MYSQL_USER
+        value: borrowbox
+      - key: MYSQL_PASSWORD
+        generateValue: true
+      - key: MYSQL_ROOT_PASSWORD
+        generateValue: true
+
+  - type: web
+    name: borrowbox-api
+    runtime: docker
+    plan: starter
+    region: singapore
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: ./apps/api
+    healthCheckPath: /health
+    disk:
+      name: uploads
+      mountPath: /app/uploads
+      sizeGB: 1
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_HOST
+        fromService:
+          type: pserv
+          name: borrowbox-mysql
+          property: host
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_NAME
+        value: borrowbox
+      - key: DB_USER
+        value: borrowbox
+      - key: DB_PASSWORD
+        fromService:
+          type: pserv
+          name: borrowbox-mysql
+          envVarKey: MYSQL_PASSWORD
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: APP_URL # your Vercel URL, e.g. https://borrowbox.vercel.app
+        sync: false
+      - key: API_PUBLIC_URL # same as APP_URL (uploaded images are served through the Vercel proxy)
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ALLOWED_EMAIL_DOMAIN
+        value: campus.edu
+      - key: APP_TIMEZONE
+        value: Asia/Kolkata
+      - key: MAIL_MODE # smtp; falls back to printing emails in the logs while SMTP_HOST is empty
+        value: smtp
+      - key: MAIL_FROM
+        value: "BorrowBox <no-reply@campus.edu>"
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false

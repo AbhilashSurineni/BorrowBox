@@ -1,0 +1,11 @@
+# Local development: emails are printed to the console, demo data is seeded.
+app:
+  mail:
+    mode: ${MAIL_MODE:log}
+  jwt:
+    secret: ${JWT_SECRET:dev-access-secret-change-me-0123456789abcdef}
+    refresh-secret: ${JWT_REFRESH_SECRET:dev-refresh-secret-change-me-0123456789abcdef}
+  seed:
+    admin-email: ${ADMIN_EMAIL:admin@campus.edu}
+    admin-password: ${ADMIN_PASSWORD:Admin12345}
+    demo-data: true

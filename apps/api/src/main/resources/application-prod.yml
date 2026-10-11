@@ -1,0 +1,9 @@
+# Production: secrets must come from the environment; cookies are Secure.
+app:
+  cookie:
+    secure: true
+  mail:
+    mode: ${MAIL_MODE:smtp}
+logging:
+  level:
+    root: INFO

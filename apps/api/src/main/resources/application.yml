@@ -1,0 +1,88 @@
+server:
+  port: ${PORT:8080}
+  forward-headers-strategy: framework
+  error:
+    whitelabel:
+      enabled: false
+
+spring:
+  application:
+    name: borrowbox-api
+  profiles:
+    default: dev
+  datasource:
+    # Either a full DB_URL, or DB_HOST / DB_PORT / DB_NAME (used on Render).
+    url: ${DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:borrowbox}?useUnicode=true&characterEncoding=utf8&connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true}
+    username: ${DB_USER:borrowbox}
+    password: ${DB_PASSWORD:borrowbox}
+    hikari:
+      # READ COMMITTED: after taking a row lock, each statement sees the latest committed data
+      # (same semantics the PostgreSQL version relied on). See docs/DB_NOTES.md.
+      transaction-isolation: TRANSACTION_READ_COMMITTED
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    time-zone: UTC
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 30MB
+  mail:
+    host: ${SMTP_HOST:}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USER:}
+    password: ${SMTP_PASS:}
+    properties:
+      mail.smtp.auth: ${SMTP_AUTH:true}
+      mail.smtp.starttls.enable: ${SMTP_STARTTLS:true}
+
+app:
+  app-url: ${APP_URL:http://localhost:5173}
+  api-public-url: ${API_PUBLIC_URL:http://localhost:8080}
+  cors-origins: ${CORS_ORIGIN:${APP_URL:http://localhost:5173}}
+  allowed-email-domains: ${ALLOWED_EMAIL_DOMAIN:campus.edu}
+  timezone: ${APP_TIMEZONE:UTC}
+  bcrypt-strength: ${BCRYPT_STRENGTH:12}
+  cron-enabled: ${CRON_ENABLED:true}
+  rate-limit-enabled: ${RATE_LIMIT_ENABLED:true}
+  jwt:
+    secret: ${JWT_SECRET}
+    refresh-secret: ${JWT_REFRESH_SECRET}
+    access-token-ttl: ${ACCESS_TOKEN_TTL:15m}
+    refresh-token-ttl-days: ${REFRESH_TOKEN_TTL_DAYS:7}
+  cookie:
+    same-site: ${COOKIE_SAMESITE:Lax}
+    secure: ${COOKIE_SECURE:false}
+  mail:
+    # log = print emails to the console, smtp = JavaMailSender, memory = keep in memory (tests)
+    mode: ${MAIL_MODE:smtp}
+    from: ${MAIL_FROM:BorrowBox <no-reply@campus.edu>}
+  storage:
+    driver: ${STORAGE_DRIVER:local}
+    upload-dir: ${UPLOAD_DIR:uploads}
+  cloudinary:
+    cloud-name: ${CLOUDINARY_CLOUD_NAME:}
+    api-key: ${CLOUDINARY_API_KEY:}
+    api-secret: ${CLOUDINARY_API_SECRET:}
+  seed:
+    admin-email: ${ADMIN_EMAIL:}
+    admin-password: ${ADMIN_PASSWORD:}
+    demo-data: false
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: WARN

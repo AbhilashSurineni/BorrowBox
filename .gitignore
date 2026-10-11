@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+.env
+.env.local
+*.log
+.DS_Store
+# Java API
+apps/api/target
+apps/api/uploads
+apps/api/.idea
+*.iml

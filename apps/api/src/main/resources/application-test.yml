@@ -1,0 +1,16 @@
+# Tests (Testcontainers MySQL, or TEST_DB_URL in CI): fast hashing, no cron, no rate limits.
+app:
+  bcrypt-strength: 4
+  cron-enabled: false
+  rate-limit-enabled: false
+  mail:
+    mode: memory
+  storage:
+    upload-dir: target/test-uploads
+  jwt:
+    secret: test-access-secret-0123456789abcdef0123456789
+    refresh-secret: test-refresh-secret-0123456789abcdef0123456789
+  seed:
+    admin-email: admin@campus.edu
+    admin-password: Admin12345
+    demo-data: false

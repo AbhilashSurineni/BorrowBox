@@ -1,0 +1,54 @@
+# Local stack: MySQL 8 + the Spring Boot API. The React app runs with `npm run dev:web` (it calls the API at http://localhost:8080/api/v1).
+services:
+  mysql:
+    image: mysql:8.0
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      # required so Flyway can create the loans overlap triggers as a non-SUPER user (see docs/DB_NOTES.md)
+      - --log-bin-trust-function-creators=1
+    environment:
+      MYSQL_DATABASE: borrowbox
+      MYSQL_USER: borrowbox
+      MYSQL_PASSWORD: ${DB_PASSWORD:-borrowbox}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uborrowbox -p$$MYSQL_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: ./apps/api
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      DB_URL: jdbc:mysql://mysql:3306/borrowbox?useUnicode=true&characterEncoding=utf8&connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true
+      DB_USER: borrowbox
+      DB_PASSWORD: ${DB_PASSWORD:-borrowbox}
+      JWT_SECRET: ${JWT_SECRET:-dev-access-secret-change-me-0123456789abcdef}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret-change-me-0123456789abcdef}
+      APP_URL: ${APP_URL:-http://localhost:5173}
+      API_PUBLIC_URL: ${API_PUBLIC_URL:-http://localhost:8080}
+      ALLOWED_EMAIL_DOMAIN: ${ALLOWED_EMAIL_DOMAIN:-campus.edu}
+      APP_TIMEZONE: ${APP_TIMEZONE:-UTC}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@campus.edu}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin12345}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads:/app/uploads
+
+volumes:
+  mysql-data:
+  uploads:

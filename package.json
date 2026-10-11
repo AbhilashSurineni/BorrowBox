@@ -1,0 +1,17 @@
+{
+  "name": "borrowbox",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/web"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @borrowbox/web",
+    "build": "npm run build -w @borrowbox/web",
+    "preview": "npm run preview -w @borrowbox/web",
+    "lint": "npm run lint -w @borrowbox/web"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
