@@ -18,4 +18,4 @@ ENV SPRING_PROFILES_ACTIVE=prod \
     UPLOAD_DIR=/app/uploads \
     PORT=8080
 EXPOSE 8080
-ENTRYPOINT ["java", "-Djava.awt.headless=true", "-XX:MaxRAMPercentage=75", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-Djava.awt.headless=true", "-XX:+UseSerialGC", "-Xss512k", "-XX:MaxRAMPercentage=70", "-jar", "/app/app.jar"]
