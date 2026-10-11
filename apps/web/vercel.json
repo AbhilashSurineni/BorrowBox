@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     { "source": "/api/:path*", "destination": "https://borrowbox-drp5.onrender.com/api/:path*" },
-    { "source": "/uploads/:path*", "destination": "https://borrowbox-drp5.onrender.com/api/:path*" },
+    { "source": "/uploads/:path*", "destination": "https://borrowbox-drp5.onrender.com/uploads/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
